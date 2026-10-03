@@ -6,7 +6,7 @@
 <title>The Closet | Admin</title>
 <script>
 // Hidden entrance: only reachable after the 10-tap + admin name step on the store page
-if(sessionStorage.getItem("gate")!=="1") location.replace("closet.html");
+if(sessionStorage.getItem("gate")!=="1") location.replace("index.html");
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -68,7 +68,7 @@ tbody tr:hover{background:var(--bg)}
 <main id="admin-panel" style="display:none">
   <header>
     <h1>The Closet — Admin</h1>
-    <div class="row"><a class="btn alt" href="closet.html" target="_blank">View Live Store</a><button class="btn danger" onclick="handleLogout()">Logout</button></div>
+    <div class="row"><a class="btn alt" href="index.html" target="_blank">View Live Store</a><button class="btn danger" onclick="handleLogout()">Logout</button></div>
   </header>
 
   <section class="card">
@@ -171,7 +171,7 @@ function handleLogin(e){
   if($("admin-pass").value===ADMIN_PASS){sessionStorage.setItem("admin_auth","true");boot()}
   else $("login-err").textContent="Incorrect password.";
 }
-function handleLogout(){sessionStorage.removeItem("admin_auth");sessionStorage.removeItem("gate");location.replace("closet.html")}
+function handleLogout(){sessionStorage.removeItem("admin_auth");sessionStorage.removeItem("gate");location.replace("index.html")}
 function boot(){
   if(sessionStorage.getItem("admin_auth")!=="true")return;
   $("login-screen").style.display="none";$("admin-panel").style.display="grid";
