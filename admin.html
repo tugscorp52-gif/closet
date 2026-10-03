@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Closet | Admin</title>
+<script>
+// Hidden entrance: only reachable after the 10-tap + admin name step on the store page
+if(sessionStorage.getItem("gate")!=="1") location.replace("closet.html");
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e9eff8;--ink:#101a33;--mute:#56627d;--card:#ffffff;--stitch:#1f4fd8;--gold:#f2b01e;--accent:#d92d3a;--line:#d3ddee;--sh:0 14px 34px -18px #101a3366}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1022;--ink:#eaf0ff;--mute:#97a4c4;--card:#131c38;--stitch:#8fb0ff;--accent:#ff5d6c;--line:#25305a;--sh:0 14px 34px -16px #000b}}
+:root[data-theme="dark"]{--bg:#0a1022;--ink:#eaf0ff;--mute:#97a4c4;--card:#131c38;--stitch:#8fb0ff;--accent:#ff5d6c;--line:#25305a;--sh:0 14px 34px -16px #000b}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-behavior:smooth}
+*,*:before,*:after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.6 Figtree,system-ui,sans-serif;padding:20px 16px 80px}
+h1,h2,h3{font-family:"Bricolage Grotesque",Figtree,sans-serif;letter-spacing:-.02em;margin:0}
+.twill{background:repeating-linear-gradient(135deg,#ffffff0d 0 2px,transparent 2px 7px),linear-gradient(160deg,#1b2d63,#0f1938);color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:var(--sh)}
+.btn{display:inline-block;font:700 .9rem Figtree,sans-serif;background:var(--gold);color:#101a33;border:2px solid transparent;border-radius:999px;padding:10px 20px;cursor:pointer;text-align:center;text-decoration:none;transition:transform .15s,filter .15s}
+.btn:hover{filter:brightness(1.06);transform:translateY(-1px)}
+.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--stitch);outline-offset:2px}
+.btn.alt{background:none;color:var(--ink);border-color:var(--line)}
+.btn.dark{background:var(--ink);color:var(--bg)}
+.btn.danger{background:var(--accent);color:#fff}
+.btn.sm{padding:4px 10px;font-size:.8rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.78rem;font-weight:600;background:var(--line);color:var(--ink);white-space:nowrap}
+input,select,textarea{width:100%;font:400 .95rem Figtree,sans-serif;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:4px}
+label{font-weight:600;display:block;margin-bottom:4px;font-size:.9rem}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.modal{display:none;position:fixed;inset:20px;max-width:500px;margin:auto;z-index:100;max-height:90vh;overflow-y:auto;height:fit-content;overscroll-behavior:contain}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+main{max-width:1000px;margin:0 auto;display:grid;gap:24px}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;border-radius:18px;padding:18px 22px;box-shadow:var(--sh);background:repeating-linear-gradient(135deg,#ffffff0d 0 2px,transparent 2px 7px),linear-gradient(160deg,#1b2d63,#0f1938);color:#fff}
+header h1{font-size:1.5rem;color:#fff}
+header .btn.alt{color:#fff;border-color:#ffffff55}
+.card h2{font-size:1.25rem}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.92rem}
+th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:.8rem;color:var(--mute);font-weight:700}
+tbody tr:hover{background:var(--bg)}
+.empty{color:var(--mute);text-align:center;padding:24px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:14px}
+.stat{background:var(--bg);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:12px;padding:14px}
+.stat b{display:block;font:800 1.6rem "Bricolage Grotesque",sans-serif;color:var(--stitch)}
+.stat span{font-size:.82rem;color:var(--mute)}
+.thumb{width:48px;height:56px;border-radius:8px;object-fit:cover;background:var(--line);display:block}
+.login{max-width:420px;margin:80px auto;border-top:6px solid var(--gold)}
+.modal{box-shadow:0 0 0 100vmax #0009,var(--sh)}
+#msg{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-weight:600;font-size:.9rem;z-index:200}#msg:empty{display:none}
+</style>
+</head>
+<body>
+<div id="login-screen" class="login card">
+  <h2>Admin Login</h2>
+  <p style="color:var(--mute);font-size:.9rem;margin:8px 0 20px">Enter your admin password.</p>
+  <form onsubmit="handleLogin(event)">
+    <div style="margin-bottom:16px"><label for="admin-pass">Password</label><input type="password" id="admin-pass" required autocomplete="off"></div>
+    <button class="btn" style="width:100%">Access Portal</button>
+    <p id="login-err" style="color:var(--accent);font-size:.85rem;margin:12px 0 0"></p>
+  </form>
+</div>
+
+<main id="admin-panel" style="display:none">
+  <header>
+    <h1>The Closet — Admin</h1>
+    <div class="row"><a class="btn alt" href="closet.html" target="_blank">View Live Store</a><button class="btn danger" onclick="handleLogout()">Logout</button></div>
+  </header>
+
+  <section class="card">
+    <div class="row" style="justify-content:space-between"><h2>Activity Overview</h2>
+      <select id="range" onchange="setRange(this.value)" style="width:auto"><option value="1">Today</option><option value="7" selected>Last 7 days</option><option value="30">Last 30 days</option><option value="all">All time</option></select></div>
+    <div class="stats" id="stats"></div>
+    <h3 style="font-size:1rem;margin-top:20px">Interactions per day (last 7 days)</h3>
+    <div id="chart" style="display:flex;gap:8px;align-items:flex-end;margin:12px 0"></div>
+    <div id="insights" style="font-size:.92rem"></div>
+  </section>
+
+  <section class="card">
+    <div class="row" style="justify-content:space-between">
+      <div><h2>Inventory</h2><p style="color:var(--mute);font-size:.9rem;margin:2px 0 0">Everything here shows live on the store. <span id="msg"></span></p></div>
+      <button class="btn" onclick="openModal()">+ Add New Item</button>
+    </div>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>Photo</th><th>Item</th><th>Price</th><th>Qty</th><th>Views</th><th>Cart adds</th><th>Sold</th><th>Action</th></tr></thead>
+      <tbody id="inventory-list"></tbody>
+    </table></div>
+  </section>
+
+  <section class="card">
+    <h2>Sold Items (auto-removed from shop)</h2>
+    <p style="color:var(--mute);font-size:.9rem;margin:4px 0 0">Pieces leave the store the moment the last one is ordered. Restore them here when you get them back in stock.</p>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>Photo</th><th>Item</th><th>Sold on</th><th>Order</th><th>Action</th></tr></thead>
+      <tbody id="archive-list"></tbody>
+    </table></div>
+  </section>
+
+  <section class="card">
+    <h2>Customer Orders</h2>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>Code</th><th>Customer & Items</th><th>Payment</th><th>Stage</th></tr></thead>
+      <tbody id="orders-list"></tbody>
+    </table></div>
+  </section>
+
+  <section class="card">
+    <h2>Customer Reviews</h2>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>Name</th><th>Rating</th><th>Review</th><th>Action</th></tr></thead>
+      <tbody id="reviews-list"></tbody>
+    </table></div>
+  </section>
+
+  <section class="card">
+    <h2>Shop Settings</h2>
+    <p style="color:var(--mute);font-size:.9rem;margin:4px 0 0">Shown to customers at checkout. Change these any time.</p>
+    <div style="display:grid;gap:12px;max-width:500px;margin-top:12px">
+      <div><label>WhatsApp number for order alerts (with country code)</label><input id="s-wa" placeholder="254712345678"></div>
+      <div><label>Payment instructions</label><input id="s-pay" placeholder="Send to Till 123456 (The Closet)"></div>
+      <div><label>Delivery fee / note</label><input id="s-fee" placeholder="Nairobi KSh 200"></div>
+      <button class="btn" style="width:fit-content" onclick="saveCfg()">Save Settings</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Backup & Restore</h2>
+    <p style="color:var(--mute);font-size:.9rem;margin:4px 0 0">Browser data can be wiped by clearing history, so download a backup regularly. Restoring replaces the data on this browser.</p>
+    <div class="row" style="margin-top:12px"><button class="btn" onclick="exportData()">Download backup</button>
+      <label class="btn alt" style="margin:0;cursor:pointer">Restore from file<input type="file" accept=".json" style="display:none" onchange="importData(this)"></label></div>
+  </section>
+</main>
+
+<div id="item-modal" class="card modal">
+  <h3 id="modal-title" style="margin-bottom:16px">Add New Clothing Item</h3>
+  <form onsubmit="saveItem(event)">
+    <input type="hidden" id="f-id">
+    <div style="margin-bottom:12px"><label>Photo</label><input type="file" id="f-img" accept="image/*">
+      <img id="f-preview" class="thumb" style="width:90px;height:105px;margin-top:8px;display:none"></div>
+    <div style="margin-bottom:12px"><label>Item Name</label><input id="f-name" required placeholder="e.g. Vintage Corduroy Jacket"></div>
+    <div style="margin-bottom:12px"><label>Category</label>
+      <select id="f-cat"><option>Jeans</option><option>Shirts</option><option>Jackets</option><option>Belts</option><option>Ties</option><option>Scarfs</option></select></div>
+    <div style="margin-bottom:12px"><label>Size (e.g. M, XL, 32)</label><input id="f-size"></div>
+    <div style="margin-bottom:12px"><label>Price in KSh (blank = "Ask")</label><input type="number" id="f-price" min="0"></div>
+    <div style="margin-bottom:12px"><label>Quantity in stock (1 = one-of-a-kind)</label><input type="number" id="f-qty" min="1" value="1" required></div>
+    <div style="margin-bottom:16px"><label>Description</label><textarea id="f-desc" rows="3" placeholder="Faded wash, contrast stitching..."></textarea></div>
+    <div class="row"><button class="btn">Save Item</button><button type="button" class="btn alt" onclick="closeModal()">Cancel</button></div>
+  </form>
+</div>
+
+<script>
+const ADMIN_PASS="frankwhite";
+const STG=["Order sent","Confirmed","Packed","On the way","Delivered"];
+const rd=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(_){return d}};
+const wr=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(_){return false}};
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>"&#"+c.charCodeAt(0)+";");
+const $=id=>document.getElementById(id);
+const inv=()=>rd("t_inv2",[]);
+const ev=()=>rd("t_ev",[]);
+const th=i=>i.img?`<img class="thumb" src="${i.img}">`:`<div class="thumb"></div>`;
+let pendingImg=null;
+
+function flash(t){$("msg").textContent=t;setTimeout(()=>$("msg").textContent="",2500)}
+
+function handleLogin(e){
+  e.preventDefault();
+  if($("admin-pass").value===ADMIN_PASS){sessionStorage.setItem("admin_auth","true");boot()}
+  else $("login-err").textContent="Incorrect password.";
+}
+function handleLogout(){sessionStorage.removeItem("admin_auth");sessionStorage.removeItem("gate");location.replace("closet.html")}
+function boot(){
+  if(sessionStorage.getItem("admin_auth")!=="true")return;
+  $("login-screen").style.display="none";$("admin-panel").style.display="grid";
+  renderAll();
+}
+function renderAll(){loadCfg();loadStats();loadInventory();loadArchive();loadOrders();loadReviews()}
+
+let range="7";const DAY=864e5;
+const fromTs=()=>range==="all"?0:range==="1"?new Date().setHours(0,0,0,0):Date.now()-Number(range)*DAY;
+const evIn=()=>{const f=fromTs();return ev().filter(e=>e.t>=f)};
+const byItem=(E,k)=>{const m={};E.filter(e=>e.k===k&&e.id).forEach(e=>m[e.id]=(m[e.id]||0)+(e.n||1));return m};
+const amt=o=>o.total!=null?o.total:(parseInt(String(o.tt).replace(/\D/g,""))||0);
+const nameOf=id=>{const x=inv().concat(rd("t_arch",[])).find(i=>i.id===id);return x?x.n:"(deleted item)"};
+function setRange(r){range=r;loadStats();loadInventory()}
+
+function loadStats(){
+  const E=evIn(),sum=k=>E.filter(e=>e.k===k).reduce((a,e)=>a+(e.n||1),0),f=fromTs();
+  const orders=rd("tc",[]).filter(o=>(o.at||0)>=f),paid=orders.filter(o=>o.pay==="Paid");
+  const visits=E.filter(e=>e.k==="visit").length;
+  const rev=paid.reduce((a,o)=>a+amt(o),0),due=orders.filter(o=>o.pay!=="Paid").reduce((a,o)=>a+amt(o),0);
+  const cells=[["Store visits",visits],["Item views",sum("view")],["Cart adds",sum("cart")],["Orders",orders.length],["Paid revenue (KSh)",rev.toLocaleString()],["Awaiting payment (KSh)",due.toLocaleString()],["Visit → order",visits?Math.round(orders.length/visits*100)+"%":"—"],["Live items",inv().length],["Sold out",rd("t_arch",[]).length]];
+  $("stats").innerHTML=cells.map(c=>`<div class="stat"><b>${c[1]}</b><span>${c[0]}</span></div>`).join("");
+  const all=ev(),days=[...Array(7)].map((_,i)=>{const d=new Date();d.setHours(0,0,0,0);return d.getTime()-(6-i)*DAY});
+  const bars=days.map(d=>({d,n:all.filter(e=>e.t>=d&&e.t<d+DAY&&e.k!=="visit").length})),mx=Math.max(1,...bars.map(b=>b.n));
+  $("chart").innerHTML=bars.map(b=>`<div style="flex:1;text-align:center"><div style="height:${Math.max(3,b.n/mx*80)}px;background:var(--stitch);border-radius:6px 6px 0 0"></div><small>${new Date(b.d).toLocaleDateString(undefined,{weekday:"short"})}</small><br><small style="color:var(--mute)">${b.n}</small></div>`).join("");
+  const V=byItem(E,"view"),C=byItem(E,"cart"),O=byItem(E,"order");
+  const top=Object.entries(V).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([id,n])=>`${esc(nameOf(id))} (${n})`);
+  const stuck=Object.keys(C).filter(id=>!O[id]).map(id=>esc(nameOf(id)));
+  $("insights").innerHTML=`<p style="margin:4px 0"><b>Most viewed:</b> ${top.join(", ")||"no views yet"}</p><p style="margin:4px 0"><b>Added to cart but not bought:</b> ${stuck.join(", ")||"none"}</p>`;
+}
+
+function loadInventory(){
+  const E=evIn(),V=byItem(E,"view"),C=byItem(E,"cart"),O=byItem(E,"order"),items=inv();
+  $("inventory-list").innerHTML=items.length?items.map(i=>`<tr>
+    <td>${th(i)}</td>
+    <td><b>${esc(i.n)}</b> <span class="badge">${esc(i.c)}</span>${i.s?` <span class="badge">${esc(i.s)}</span>`:""}<br><small style="color:var(--mute)">${esc(i.t)}</small></td>
+    <td>${i.p?"KSh "+i.p.toLocaleString():"Ask"}</td><td><b>${i.qty}</b></td>
+    <td>${V[i.id]||0}</td><td>${C[i.id]||0}</td><td>${O[i.id]||0}</td>
+    <td><div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn alt sm" onclick="openModal('${i.id}')">Edit</button><button class="btn danger sm" onclick="deleteItem('${i.id}')">Remove</button></div></td>
+  </tr>`).join(""):`<tr><td colspan="8" class="empty">No items on the store.</td></tr>`;
+}
+
+function loadArchive(){
+  const a=rd("t_arch",[]);
+  $("archive-list").innerHTML=a.length?a.map((i,x)=>`<tr>
+    <td>${th(i)}</td><td><b>${esc(i.n)}</b></td>
+    <td>${i.soldAt?new Date(i.soldAt).toLocaleDateString():"Removed"}</td><td>${esc(i.soldOrder||"—")}</td>
+    <td><div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm" onclick="restore(${x})">Restore to shop</button><button class="btn alt sm" onclick="purge(${x})">Delete</button></div></td>
+  </tr>`).join(""):`<tr><td colspan="5" class="empty">Nothing sold or removed yet.</td></tr>`;
+}
+function restore(x){
+  const a=rd("t_arch",[]),it=a.splice(x,1)[0];
+  const q=parseInt(prompt("How many are back in stock?","1"),10);
+  if(!(q>0)){return}
+  delete it.soldAt;delete it.soldOrder;it.qty=q;
+  const items=inv();items.unshift(it);wr("t_inv2",items);wr("t_arch",a);renderAll();flash("Item restored to the store.");
+}
+function purge(x){if(confirm("Permanently delete this item?")){const a=rd("t_arch",[]);a.splice(x,1);wr("t_arch",a);renderAll()}}
+
+function openModal(id){
+  const it=id?inv().find(x=>x.id===id):null;pendingImg=null;
+  $("modal-title").textContent=it?"Edit Clothing Item":"Add New Clothing Item";
+  $("f-id").value=it?it.id:"";$("f-name").value=it?it.n:"";$("f-cat").value=it?it.c:"Jeans";
+  $("f-size").value=it?it.s||"":"";$("f-price").value=it&&it.p?it.p:"";$("f-qty").value=it?it.qty:1;$("f-desc").value=it?it.t:"";$("f-img").value="";
+  const p=$("f-preview");p.style.display=it&&it.img?"block":"none";p.src=it&&it.img?it.img:"";
+  $("item-modal").style.display="block";
+}
+function closeModal(){$("item-modal").style.display="none"}
+
+$("f-img").addEventListener("change",async e=>{
+  const f=e.target.files[0];if(!f)return;
+  pendingImg=await compress(f);$("f-preview").src=pendingImg;$("f-preview").style.display="block";
+});
+function compress(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>{const im=new Image();im.onload=()=>{
+      const s=Math.min(1,700/Math.max(im.width,im.height)),c=document.createElement("canvas");
+      c.width=im.width*s;c.height=im.height*s;c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+      res(c.toDataURL("image/jpeg",.75))};im.onerror=rej;im.src=r.result};
+    r.onerror=rej;r.readAsDataURL(file);
+  });
+}
+
+function saveItem(e){
+  e.preventDefault();
+  const id=$("f-id").value,items=inv(),old=id?items.find(x=>x.id===id):null;
+  const item={id:id||"i"+Date.now(),n:$("f-name").value.trim(),c:$("f-cat").value,
+    s:$("f-size").value.trim(),p:$("f-price").value?Number($("f-price").value):null,qty:Math.max(1,parseInt($("f-qty").value,10)||1),
+    t:$("f-desc").value.trim(),img:pendingImg||(old&&old.img)||""};
+  if(old)items[items.indexOf(old)]=item;else items.unshift(item);
+  if(!wr("t_inv2",items)){flash("Storage full: use a smaller photo or remove old items.");return}
+  closeModal();renderAll();flash("Saved. It's live on the store.");
+}
+function deleteItem(id){
+  if(!confirm("Remove this item from the store? It moves to the Sold/Removed list so you can restore it later."))return;
+  const items=inv(),it=items.find(x=>x.id===id),arch=rd("t_arch",[]);
+  arch.unshift(Object.assign({},it,{soldAt:null}));
+  wr("t_arch",arch);wr("t_inv2",items.filter(x=>x.id!==id));renderAll();
+}
+
+function loadOrders(){
+  const o=rd("tc",[]),st=rd("ST",{});
+  $("orders-list").innerHTML=o.length?o.map(x=>`<tr>
+    <td><b>${esc(x.code)}</b></td>
+    <td>${esc(x.n)}<br><small style="color:var(--mute)">${esc((x.items||[]).map(i=>i.n+" ×"+i.q).join(", "))}<br><b>Total: ${esc(x.tt)}</b></small></td>
+    <td><select onchange="setPay('${esc(x.code)}',this.value)"><option ${x.pay==="Paid"?"":"selected"}>Pending</option><option ${x.pay==="Paid"?"selected":""}>Paid</option></select></td>
+    <td><select onchange="setStage('${esc(x.code)}',this.value)">${STG.map((s,i)=>`<option value="${i}" ${i===(st[x.code]||0)?"selected":""}>${s}</option>`).join("")}</select></td>
+  </tr>`).join(""):`<tr><td colspan="4" class="empty">No customer orders yet.</td></tr>`;
+}
+function setPay(code,v){const o=rd("tc",[]),x=o.find(y=>y.code===code);if(x){x.pay=v;wr("tc",o)}loadStats();flash("Order "+code+": "+v)}
+function setStage(code,v){const s=rd("ST",{});s[code]=parseInt(v,10);wr("ST",s);flash("Order "+code+": "+STG[v])}
+
+function loadReviews(){
+  const r=rd("tr",[]);
+  $("reviews-list").innerHTML=r.length?r.map((x,i)=>`<tr><td><b>${esc(x.n)}</b></td><td>${"★".repeat(x.s||5)}${"☆".repeat(5-(x.s||5))}</td><td>${esc(x.t)}</td>
+    <td><button class="btn alt sm" onclick="delReview(${i})">Delete</button></td></tr>`).join(""):`<tr><td colspan="4" class="empty">No reviews yet.</td></tr>`;
+}
+function delReview(i){if(confirm("Delete this review?")){const r=rd("tr",[]);r.splice(i,1);wr("tr",r);loadReviews()}}
+
+const KEYS=["t_inv2","t_arch","tc","ST","tr","t_ev","t_cfg"];
+function loadCfg(){const c=rd("t_cfg",{});$("s-wa").value=c.wa||"";$("s-pay").value=c.pay||"";$("s-fee").value=c.fee||""}
+function saveCfg(){wr("t_cfg",{wa:$("s-wa").value.trim(),pay:$("s-pay").value.trim(),fee:$("s-fee").value.trim()});flash("Settings saved.")}
+function exportData(){
+  const d={};KEYS.forEach(k=>d[k]=rd(k,null));
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(d)],{type:"application/json"}));
+  a.download="closet-backup-"+new Date().toISOString().slice(0,10)+".json";a.click();
+}
+function importData(inp){
+  const f=inp.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{const d=JSON.parse(r.result);if(!confirm("Replace all current data with this backup?"))return;
+    KEYS.forEach(k=>{if(d[k]!=null)wr(k,d[k])});renderAll();flash("Backup restored.")}catch(_){flash("That file isn't a valid backup.")}inp.value=""};
+  r.readAsText(f);
+}
+boot();
+</script>
+</body>
+</html>
